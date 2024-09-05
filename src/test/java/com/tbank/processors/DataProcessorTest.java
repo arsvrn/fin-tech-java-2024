@@ -1,19 +1,26 @@
 package com.tbank.processors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tbank.model.City;
 import com.tbank.model.Coords;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataProcessorTest {
 
-    private final DataProcessor<City> cityProcessor = new DataProcessor<>();
+    private static DataProcessor<City> cityProcessor;
 
+    @BeforeAll
+    static void setUp() {
+       cityProcessor = new DataProcessor<>();
+    }
     @Test
-    void testReadValidJson() {
+    void testReadValidJson() throws IOException {
         City city = cityProcessor.readJson("src/test/resources/city.json", City.class);
         assertNotNull(city);
         assertEquals("spb", city.getSlug());
@@ -22,13 +29,13 @@ public class DataProcessorTest {
     }
 
     @Test
-    void testReadInvalidJson() {
+    void testReadInvalidJson() throws IOException {
         City city = cityProcessor.readJson("src/test/resources/city-error.json", City.class);
         assertNull(city);
     }
 
     @Test
-    void testConvertToXml() {
+    void testConvertToXml() throws JsonProcessingException {
         City city = new City("spb", new Coords(59.939095, 30.315868));
         String xml = cityProcessor.toXML(city);
         assertNotNull(xml);
@@ -36,7 +43,7 @@ public class DataProcessorTest {
     }
 
     @Test
-    void testSaveToFile() {
+    void testSaveToFile() throws IOException {
         String data = "<City><slug>spb</slug></City>";
         String filePath = "src/test/resources/output.xml";
         cityProcessor.saveToFile(data, filePath);

@@ -3,6 +3,7 @@ package com.tbank.processors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -10,11 +11,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 @Slf4j
+@AllArgsConstructor
 public class DataProcessor<T> {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper;
 
-    public T readJson(String filePath, Class<T> clazz) {
+    public DataProcessor() {
+        this.objectMapper = new ObjectMapper();
+        this.xmlMapper = new XmlMapper();
+    }
+
+    public T readJson(String filePath, Class<T> clazz) throws IOException {
         log.info("Starting to read JSON from a file: {}", filePath);
         try {
             T result = objectMapper.readValue(new File(filePath), clazz);
@@ -22,27 +30,26 @@ public class DataProcessor<T> {
             return result;
         } catch (JsonProcessingException e) {
             log.error("JSON parsing error: {}", e.getMessage());
-            return null;
+            throw e;
         } catch (IOException e) {
             log.error("File reading error: {}", e.getMessage());
-            return null;
+            throw e;
         }
     }
 
-    public String toXML(T object) {
+    public String toXML(T object) throws JsonProcessingException {
         log.info("Converting an object to XML");
-        XmlMapper xmlMapper = new XmlMapper();
         try {
             String xml = xmlMapper.writeValueAsString(object);
             log.debug("The conversion is successful: {}", xml);
             return xml;
         } catch (JsonProcessingException e) {
             log.error("Error converting to XML: {}", e.getMessage());
-            return null;
+            throw e;
         }
     }
 
-    public void saveToFile(String data, String filePath) {
+    public void saveToFile(String data, String filePath) throws IOException {
         log.info("Saving data to a file: {}", filePath);
         try {
             File file = new File(filePath);
@@ -54,6 +61,7 @@ public class DataProcessor<T> {
             log.info("The data has been successfully saved to a file: {}", filePath);
         } catch (IOException e) {
             log.error("Error saving to file: {}", e.getMessage());
+            throw e;
         }
     }
 }
