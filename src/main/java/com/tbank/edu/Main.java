@@ -1,4 +1,4 @@
-package com.tbank;
+package com.tbank.edu;
 
 public class Main {
     public static void main(String[] args) {

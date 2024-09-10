@@ -1,8 +1,8 @@
-package com.tbank.processors;
+package com.tbank.edu.hw2.processors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.tbank.model.City;
-import com.tbank.model.Coords;
+import com.tbank.edu.hw2.model.City;
+import com.tbank.edu.hw2.model.Coords;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
