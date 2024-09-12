@@ -1,4 +1,4 @@
-package com.tbank.processors;
+package com.tbank.edu.hw2.processors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
