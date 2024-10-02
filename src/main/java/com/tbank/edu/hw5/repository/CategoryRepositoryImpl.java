@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class CategoryRepository implements ICategoryRepository {
+public class CategoryRepositoryImpl extends AbstractCrudRepository<Category, Integer> {
     private final Map<Integer, Category> categories = new ConcurrentHashMap<>();
 
     @Override
@@ -19,7 +19,7 @@ public class CategoryRepository implements ICategoryRepository {
     }
 
     @Override
-    public Optional<Category> findById(int id) {
+    public Optional<Category> findBy(Integer id) {
         return Optional.ofNullable(categories.get(id));
     }
 
@@ -29,7 +29,7 @@ public class CategoryRepository implements ICategoryRepository {
     }
 
     @Override
-    public void deleteById(int id) {
+    public void deleteBy(Integer id) {
         categories.remove(id);
     }
 }

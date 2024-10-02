@@ -5,6 +5,7 @@ import com.tbank.edu.hw5.service.LocationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.tbank.edu.hw5.aspect.LogExecutionTime;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class LocationController {
         return ResponseEntity.ok(locations);
     }
 
+    @com.tbank.edu.hw5.aspect.LogExecutionTime
     @GetMapping("/{slug}")
     public ResponseEntity<Location> getLocationBySlug(@PathVariable String slug) {
         Optional<Location> location = locationService.getLocationBySlug(slug);

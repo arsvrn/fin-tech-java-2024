@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class LocationRepository implements ILocationRepository {
+public class LocationRepositoryImpl extends AbstractCrudRepository<Location, String> {
     private final Map<String, Location> locations = new ConcurrentHashMap<>();
 
     @Override
@@ -19,7 +19,7 @@ public class LocationRepository implements ILocationRepository {
     }
 
     @Override
-    public Optional<Location> findBySlug(String slug) {
+    public Optional<Location> findBy(String slug) {
         return Optional.ofNullable(locations.get(slug));
     }
 
@@ -29,7 +29,7 @@ public class LocationRepository implements ILocationRepository {
     }
 
     @Override
-    public void deleteBySlug(String slug) {
+    public void deleteBy(String slug) {
         locations.remove(slug);
     }
 }

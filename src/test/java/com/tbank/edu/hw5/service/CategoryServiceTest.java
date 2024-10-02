@@ -1,7 +1,7 @@
 package com.tbank.edu.hw5.service;
 
 import com.tbank.edu.hw5.model.Category;
-import com.tbank.edu.hw5.repository.ICategoryRepository;
+import com.tbank.edu.hw5.repository.CategoryRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,12 +14,12 @@ import static org.mockito.Mockito.*;
 
 class CategoryServiceTest {
 
-    private ICategoryRepository categoryRepository;
+    private CategoryRepositoryImpl categoryRepository;
     private CategoryService categoryService;
 
     @BeforeEach
     void setUp() {
-        categoryRepository = mock(ICategoryRepository.class);
+        categoryRepository = mock(CategoryRepositoryImpl.class);
         categoryService = new CategoryService(categoryRepository);
     }
 
@@ -39,9 +39,9 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getCategoryById() {
+    void getCategoryBy() {
         Category category = new Category(1, "slug 1", "Category 1");
-        when(categoryRepository.findById(1)).thenReturn(Optional.of(category));
+        when(categoryRepository.findBy(1)).thenReturn(Optional.of(category));
 
         Optional<Category> result = categoryService.getCategoryById(1);
 
@@ -65,7 +65,7 @@ class CategoryServiceTest {
         Category existingCategory = new Category(1, "slug 1", "Category 1");
         Category updatedCategory = new Category(1, "slug update", "Updated Category");
 
-        when(categoryRepository.findById(1)).thenReturn(Optional.of(existingCategory));
+        when(categoryRepository.findBy(1)).thenReturn(Optional.of(existingCategory));
 
         Optional<Category> result = categoryService.updateCategory(1, updatedCategory);
 
@@ -76,21 +76,21 @@ class CategoryServiceTest {
 
     @Test
     void deleteCategory() {
-        when(categoryRepository.findById(1)).thenReturn(Optional.of(new Category(1, "slug 1", "Category 1")));
+        when(categoryRepository.findBy(1)).thenReturn(Optional.of(new Category(1, "slug 1", "Category 1")));
 
         boolean result = categoryService.deleteCategory(1);
 
         assertTrue(result);
-        verify(categoryRepository, times(1)).deleteById(1);
+        verify(categoryRepository, times(1)).deleteBy(1);
     }
 
     @Test
     void deleteCategory_NotFound() {
-        when(categoryRepository.findById(1)).thenReturn(Optional.empty());
+        when(categoryRepository.findBy(1)).thenReturn(Optional.empty());
 
         boolean result = categoryService.deleteCategory(1);
 
         assertFalse(result);
-        verify(categoryRepository, times(0)).deleteById(1);
+        verify(categoryRepository, times(0)).deleteBy(1);
     }
 }

@@ -5,12 +5,14 @@ import com.tbank.edu.hw5.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.tbank.edu.hw5.aspect.LogExecutionTime;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/places/categories")
+@com.tbank.edu.hw5.aspect.LogExecutionTime
 public class CategoryController {
     private final CategoryService categoryService;
 

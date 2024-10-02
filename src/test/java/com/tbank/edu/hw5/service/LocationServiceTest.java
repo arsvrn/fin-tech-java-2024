@@ -1,10 +1,9 @@
 package com.tbank.edu.hw5.service;
 
 import com.tbank.edu.hw5.model.Location;
-import com.tbank.edu.hw5.repository.ILocationRepository;
+import com.tbank.edu.hw5.repository.LocationRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +14,12 @@ import static org.mockito.Mockito.*;
 
 class LocationServiceTest {
 
-    private ILocationRepository locationRepository;
+    private LocationRepositoryImpl locationRepository;
     private LocationService locationService;
 
     @BeforeEach
     void setUp() {
-        locationRepository = mock(ILocationRepository.class);
+        locationRepository = mock(LocationRepositoryImpl.class);
         locationService = new LocationService(locationRepository);
     }
 
@@ -40,9 +39,9 @@ class LocationServiceTest {
     }
 
     @Test
-    void getLocationBySlug() {
+    void getLocationBy() {
         Location location = new Location("slug1", "Location 1");
-        when(locationRepository.findBySlug("slug1")).thenReturn(Optional.of(location));
+        when(locationRepository.findBy("slug1")).thenReturn(Optional.of(location));
 
         Optional<Location> result = locationService.getLocationBySlug("slug1");
 
@@ -64,7 +63,7 @@ class LocationServiceTest {
         Location existingLocation = new Location("slug1", "Location 1");
         Location updatedLocation = new Location("slug1", "Updated Location");
 
-        when(locationRepository.findBySlug("slug1")).thenReturn(Optional.of(existingLocation));
+        when(locationRepository.findBy("slug1")).thenReturn(Optional.of(existingLocation));
 
         Optional<Location> result = locationService.updateLocation("slug1", updatedLocation);
 
@@ -75,21 +74,21 @@ class LocationServiceTest {
 
     @Test
     void deleteLocation() {
-        when(locationRepository.findBySlug("slug1")).thenReturn(Optional.of(new Location("slug1", "Location 1")));
+        when(locationRepository.findBy("slug1")).thenReturn(Optional.of(new Location("slug1", "Location 1")));
 
         boolean result = locationService.deleteLocation("slug1");
 
         assertTrue(result);
-        verify(locationRepository, times(1)).deleteBySlug("slug1");
+        verify(locationRepository, times(1)).deleteBy("slug1");
     }
 
     @Test
     void deleteLocation_NotFound() {
-        when(locationRepository.findBySlug("slug1")).thenReturn(Optional.empty());
+        when(locationRepository.findBy("slug1")).thenReturn(Optional.empty());
 
         boolean result = locationService.deleteLocation("slug1");
 
         assertFalse(result);
-        verify(locationRepository, times(0)).deleteBySlug("slug1");
+        verify(locationRepository, times(0)).deleteBy("slug1");
     }
 }

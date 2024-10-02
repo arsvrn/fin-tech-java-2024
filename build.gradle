@@ -18,9 +18,12 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.28'
     implementation 'org.slf4j:slf4j-api:2.0.9'
     implementation 'org.slf4j:slf4j-simple:2.0.9'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+    implementation('org.springframework.boot:spring-boot-starter-aop') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'

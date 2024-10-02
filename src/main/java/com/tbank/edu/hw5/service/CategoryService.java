@@ -1,7 +1,7 @@
 package com.tbank.edu.hw5.service;
 
 import com.tbank.edu.hw5.model.Category;
-import com.tbank.edu.hw5.repository.ICategoryRepository;
+import com.tbank.edu.hw5.repository.CategoryRepositoryImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.Optional;
 
 @Service
 public class CategoryService {
-    private final ICategoryRepository categoryRepository;
+    private final CategoryRepositoryImpl categoryRepository;
 
-    public CategoryService(ICategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepositoryImpl categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
@@ -20,7 +20,7 @@ public class CategoryService {
     }
 
     public Optional<Category> getCategoryById(int id) {
-        return categoryRepository.findById(id);
+        return categoryRepository.findBy(id);
     }
 
     public Category createCategory(Category category) {
@@ -29,7 +29,7 @@ public class CategoryService {
     }
 
     public Optional<Category> updateCategory(int id, Category category) {
-        if (categoryRepository.findById(id).isPresent()) {
+        if (categoryRepository.findBy(id).isPresent()) {
             categoryRepository.save(category);
             return Optional.of(category);
         }
@@ -37,9 +37,9 @@ public class CategoryService {
     }
 
     public boolean deleteCategory(int id) {
-        Optional<Category> existingCategory = categoryRepository.findById(id);
+        Optional<Category> existingCategory = categoryRepository.findBy(id);
         if (existingCategory.isPresent()) {
-            categoryRepository.deleteById(id);
+            categoryRepository.deleteBy(id);
             return true;
         }
         return false;
