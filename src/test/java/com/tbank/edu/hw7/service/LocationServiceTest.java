@@ -1,7 +1,8 @@
-package com.tbank.edu.hw5.service;
+package com.tbank.edu.hw7.service;
 
 import com.tbank.edu.hw5.model.Location;
 import com.tbank.edu.hw5.repository.LocationRepositoryImpl;
+import com.tbank.edu.hw5.service.LocationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -90,5 +91,27 @@ class LocationServiceTest {
 
         assertFalse(result);
         verify(locationRepository, times(0)).deleteBy("slug1");
+    }
+
+    @Test
+    void getLocationBySlug_NotFound() {
+        when(locationRepository.findBy("slug1")).thenReturn(Optional.empty());
+
+        Optional<Location> result = locationService.getLocationBySlug("slug1");
+
+        assertFalse(result.isPresent());
+        verify(locationRepository, times(1)).findBy("slug1");
+    }
+
+    @Test
+    void updateLocation_NotFound() {
+        Location updatedLocation = new Location("slug1", "Updated Location");
+
+        when(locationRepository.findBy("slug1")).thenReturn(Optional.empty());
+
+        Optional<Location> result = locationService.updateLocation("slug1", updatedLocation);
+
+        assertFalse(result.isPresent());
+        verify(locationRepository, times(0)).save(updatedLocation);
     }
 }

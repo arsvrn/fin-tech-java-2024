@@ -1,7 +1,8 @@
-package com.tbank.edu.hw5.service;
+package com.tbank.edu.hw7.service;
 
 import com.tbank.edu.hw5.model.Category;
 import com.tbank.edu.hw5.repository.CategoryRepositoryImpl;
+import com.tbank.edu.hw5.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -93,4 +94,27 @@ class CategoryServiceTest {
         assertFalse(result);
         verify(categoryRepository, times(0)).deleteBy(1);
     }
+
+    @Test
+    void getCategoryById_NotFound() {
+        when(categoryRepository.findBy(1)).thenReturn(Optional.empty());
+
+        Optional<Category> result = categoryService.getCategoryById(1);
+
+        assertFalse(result.isPresent());
+        verify(categoryRepository, times(1)).findBy(1);
+    }
+
+    @Test
+    void updateCategory_NotFound() {
+        Category updatedCategory = new Category(1, "slug update", "Updated Category");
+
+        when(categoryRepository.findBy(1)).thenReturn(Optional.empty());
+
+        Optional<Category> result = categoryService.updateCategory(1, updatedCategory);
+
+        assertFalse(result.isPresent());
+        verify(categoryRepository, times(0)).save(updatedCategory);
+    }
+
 }

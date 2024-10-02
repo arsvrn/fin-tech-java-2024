@@ -29,9 +29,8 @@ public class DataProcessorTest {
     }
 
     @Test
-    void testReadInvalidJson() throws IOException {
-        City city = cityProcessor.readJson("src/test/resources/city-error.json", City.class);
-        assertNull(city);
+    void testReadInvalidJson() {
+        assertThrows(JsonProcessingException.class, () -> cityProcessor.readJson("src/test/resources/city-error.json", City.class));
     }
 
     @Test

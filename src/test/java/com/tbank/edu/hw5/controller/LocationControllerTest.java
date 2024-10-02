@@ -70,8 +70,7 @@ class LocationControllerTest {
 
     @Test
     void testDeleteLocation() {
-        doNothing().when(locationService).deleteLocation("msk");
-
+        when(locationService.deleteLocation("msk")).thenReturn(true);
         ResponseEntity<?> response = locationController.deleteLocation("msk");
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(locationService, times(1)).deleteLocation("msk");
