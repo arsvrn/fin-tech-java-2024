@@ -72,8 +72,7 @@ class CategoryControllerTest {
 
     @Test
     void testDeleteCategory() {
-        doNothing().when(categoryService).deleteCategory(123);
-
+        when(categoryService.deleteCategory(123)).thenReturn(true);
         ResponseEntity<?> response = categoryController.deleteCategory(123);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(categoryService, times(1)).deleteCategory(123);
