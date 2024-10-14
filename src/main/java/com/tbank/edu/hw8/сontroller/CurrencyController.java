@@ -15,14 +15,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/currencies")
 public class CurrencyController {
 
     private final CurrencyService currencyService;
+    private final BigDecimal big0;
 
     public CurrencyController(CurrencyService currencyService) {
         this.currencyService = currencyService;
+        big0 = new BigDecimal(0);
     }
 
     @Operation(summary = "Получение курса валюты по её коду")
@@ -41,7 +45,7 @@ public class CurrencyController {
             if (code == null || code.trim().isEmpty()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Не указан код валюты");
             }
-            double rate = currencyService.getRateByCode(code);
+            BigDecimal rate = currencyService.getRateByCode(code);
             return new RateResponse(code, rate);
         } catch (CurrencyNotFoundException ex) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -73,11 +77,11 @@ public class CurrencyController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Не указана валюта назначения");
             }
 
-            if (request.getAmount() == null || request.getAmount() <= 0) {
+            if (request.getAmount() == null || request.getAmount().compareTo(big0) <= 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Сумма должна быть больше 0");
             }
 
-            double convertedAmount = currencyService.convert(
+            BigDecimal convertedAmount = currencyService.convert(
                     request.getFromCurrency(),
                     request.getToCurrency(),
                     request.getAmount()

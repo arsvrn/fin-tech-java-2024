@@ -11,6 +11,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,7 +31,7 @@ class CurrencyControllerTest {
 
     @Test
     void testGetRateWithValidCurrency() throws Exception {
-        Mockito.when(currencyService.getRateByCode("USD")).thenReturn(75.0);
+        Mockito.when(currencyService.getRateByCode("USD")).thenReturn(BigDecimal.valueOf(75.0));
 
         mockMvc.perform(get("/currencies/rates/USD"))
                 .andExpect(status().isOk())
@@ -55,7 +57,7 @@ class CurrencyControllerTest {
 
     @Test
     void testConvertCurrencyWithValidRequest() throws Exception {
-        Mockito.when(currencyService.convert("USD", "RUB", 100.0)).thenReturn(7500.0);
+        Mockito.when(currencyService.convert("USD", "RUB", BigDecimal.valueOf(100.0))).thenReturn(BigDecimal.valueOf(7500.0));
 
         String requestBody = """
                     {
@@ -77,7 +79,7 @@ class CurrencyControllerTest {
     @Test
     void testConvertCurrencyWithNegativeAmount() throws Exception {
         doThrow(new IllegalArgumentException("Сумма должна быть больше 0")).when(currencyService)
-                .convert("USD", "RUB", -100.0);
+                .convert("USD", "RUB", BigDecimal.valueOf(-100.0));
 
         String requestBody = """
                     {
@@ -98,7 +100,7 @@ class CurrencyControllerTest {
     @Test
     void testConvertCurrencyWithNonExistingCurrency() throws Exception {
         doThrow(new CurrencyNotFoundException("Валюта не найдена")).when(currencyService)
-                .convert("XYZ", "RUB", 100.0);
+                .convert("XYZ", "RUB", BigDecimal.valueOf(100.0));
 
         String requestBody = """
                     {

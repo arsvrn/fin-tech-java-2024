@@ -13,6 +13,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -30,9 +32,12 @@ public class CurrencyService {
     private final RestClient restClient;
     private final XmlMapper xmlMapper;
 
+    private final BigDecimal big0;
+
     public CurrencyService() {
         restClient = RestClient.create();
         xmlMapper = new XmlMapper();
+        big0 = new BigDecimal(0);
     }
 
     private String getCurrentDate() {
@@ -63,7 +68,7 @@ public class CurrencyService {
         }
     }
 
-    public double getRateByCode(String code) {
+    public BigDecimal getRateByCode(String code) {
         ValCurs valCurs = getCurrencyRates("");
 
         Optional<Valute> valuteOptional = valCurs.getValuteList().stream()
@@ -71,31 +76,31 @@ public class CurrencyService {
                 .findFirst();
 
         if (code.equals("RUB")) {
-            return 1;
+            return new BigDecimal(1);
         }
         if (valuteOptional.isPresent()) {
             String value = valuteOptional.get().getValue().replace(",", ".");
-            return Double.parseDouble(value);
+            return new BigDecimal(value);
         } else {
             log.error("Валюта с кодом " + code + " не найдена");
             throw new CurrencyNotFoundException("Валюта с кодом " + code + " не найдена");
         }
     }
 
-    public double convert(String fromCurrency, String toCurrency, double amount) {
-        if (amount <= 0) {
+    public BigDecimal convert(String fromCurrency, String toCurrency, BigDecimal amount) {
+        if (amount.compareTo(big0) <= 0) {
             log.error("Сумма должна быть больше 0");
             throw new IllegalArgumentException("Сумма должна быть больше 0");
         }
 
-        double fromRate = getRateByCode(fromCurrency);
-        double toRate = getRateByCode(toCurrency);
+        BigDecimal fromRate = getRateByCode(fromCurrency);
+        BigDecimal toRate = getRateByCode(toCurrency);
 
-        if (fromRate <= 0 || toRate <= 0) {
+        if (fromRate.compareTo(big0) <= 0 || toRate.compareTo(big0) <= 0) {
             log.error("Недопустимый курс валют для конвертации");
             throw new IllegalArgumentException("Недопустимый курс валют для конвертации");
         }
 
-        return amount * (fromRate / toRate);
+        return fromRate.divide(toRate, MathContext.DECIMAL128).multiply(amount);
     }
 }
