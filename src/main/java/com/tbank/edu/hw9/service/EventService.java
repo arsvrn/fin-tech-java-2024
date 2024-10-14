@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -23,22 +24,37 @@ import java.util.stream.Collectors;
 public class EventService {
 
     private final WebClient webClient;
+    private final Semaphore semaphore;
     @Value("${kudago.events.api.url}")
     private String EVENTS_API_URL;
 
-    public EventService() {
+    public EventService(@Value("${api.kudago.concurrent-requests-limit}") int maxConcurrentRequests) {
         this.webClient = WebClient.create();
+        this.semaphore = new Semaphore(maxConcurrentRequests);
     }
 
     public Flux<Event> getEvents(String actualSince, String actualUntil) {
-        String url = EVENTS_API_URL + "?fields=title,short_title,dates,description,price,is_free" +
-                "&actual_since=" + actualSince + "&actual_until=" + actualUntil;
+        String url = EVENTS_API_URL + "?actual_since=" + actualSince + "&actual_until=" + actualUntil;
 
-        return webClient.get()
-                .uri(url)
-                .retrieve()
-                .bodyToFlux(EventResponse.class)
-                .flatMapIterable(EventResponse::getResults);
+        return Flux.defer(() -> {
+            try {
+                semaphore.acquire();
+                log.info("Отправляем запрос к KudaGo API, разрешения: {} из {}", semaphore.availablePermits(), semaphore.getQueueLength());
+
+                return webClient.get()
+                        .uri(url)
+                        .retrieve()
+                        .bodyToFlux(EventResponse.class)
+                        .flatMapIterable(EventResponse::getResults)
+                        .doFinally(signalType -> {
+                            semaphore.release();
+                            log.info("Запрос завершен, освобождено разрешение. Доступно: {}", semaphore.availablePermits());
+                        });
+            } catch (InterruptedException e) {
+                log.error("Ошибка при получении разрешения у семафора", e);
+                return Flux.error(new RuntimeException("Не удалось выполнить запрос из-за проблем с рейт-лимитингом", e));
+            }
+        });
     }
 
 
