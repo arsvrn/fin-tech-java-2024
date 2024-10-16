@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
 
 @Slf4j
 @RestController
@@ -46,6 +47,7 @@ public class EventController {
 
         return Mono.zip(budgetInRubMono, Mono.just(eventsFlux))
                 .flatMapMany(tuple -> eventService.filterEventsByBudgetAndDate(tuple.getT2(), tuple.getT1(), from, to))
+                .sort(Comparator.comparing(Event::getFavoritesCount).reversed())
                 .onErrorResume(EventServiceException.class, ex -> {
                     log.error("Ошибка при обработке событий: {}", ex.getMessage());
                     return Flux.error(ex);

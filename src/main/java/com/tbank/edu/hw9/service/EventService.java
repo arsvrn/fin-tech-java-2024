@@ -34,7 +34,8 @@ public class EventService {
     }
 
     public Flux<Event> getEvents(String actualSince, String actualUntil) {
-        String url = EVENTS_API_URL + "?actual_since=" + actualSince + "&actual_until=" + actualUntil;
+        String url = EVENTS_API_URL + "?fields=dates,title,short_title,description,price,is_free,favorites_count" +
+                "&actual_since=" + actualSince + "&actual_until=" + actualUntil;
 
         return Flux.defer(() -> {
             try {
