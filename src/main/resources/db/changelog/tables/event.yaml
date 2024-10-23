@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: event-1
+      author: aashatalov
+      changes:
+        - createTable:
+            tableName: events
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: place_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: events
+            baseColumnNames: place_id
+            referencedTableName: places
+            referencedColumnNames: id
+            onDelete: cascade
