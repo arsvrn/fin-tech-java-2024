@@ -1,11 +1,13 @@
 package com.tbank.edu.hw5.controller;
 
-import com.tbank.edu.hw5.model.Location;
-import com.tbank.edu.hw5.service.LocationService;
+import com.tbank.edu.hw10.entity.Place;
+import com.tbank.edu.hw10.exception.NotFoundException;
+import com.tbank.edu.hw10.service.PlaceService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.tbank.edu.hw5.aspect.LogExecutionTime;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,37 +15,33 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/v1/locations")
 public class LocationController {
-    private final LocationService locationService;
-
-    public LocationController(LocationService locationService) {
-        this.locationService = locationService;
-    }
+    @Autowired
+    private PlaceService locationService;
 
     @GetMapping
-    public ResponseEntity<List<Location>> getAllLocations() {
-        List<Location> locations = locationService.getAllLocations();
+    public ResponseEntity<List<Place>> getAllLocations() {
+        List<Place> locations = locationService.getAllLocations();
         return ResponseEntity.ok(locations);
     }
 
-    @com.tbank.edu.hw5.aspect.LogExecutionTime
     @GetMapping("/{slug}")
-    public ResponseEntity<Location> getLocationBySlug(@PathVariable String slug) {
-        Optional<Location> location = locationService.getLocationBySlug(slug);
-        return location.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Place> getLocationBySlug(@PathVariable String slug) {
+        return locationService.getLocationBySlug(slug)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new NotFoundException("Город с slug " + slug + " не найден"));
     }
 
     @PostMapping
-    public ResponseEntity<Location> createLocation(@RequestBody Location location) {
-        Location createdLocation = locationService.createLocation(location);
+    public ResponseEntity<Place> createLocation(@Valid @RequestBody Place Place) {
+        Place createdLocation = locationService.createLocation(Place);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLocation);
     }
 
     @PutMapping("/{slug}")
-    public ResponseEntity<Location> updateLocation(@PathVariable String slug, @RequestBody Location location) {
-        Optional<Location> updatedLocation = locationService.updateLocation(slug, location);
+    public ResponseEntity<Place> updateLocation(@PathVariable String slug, @Valid @RequestBody Place Place) {
+        Optional<Place> updatedLocation = locationService.updateLocation(slug, Place);
         return updatedLocation.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new NotFoundException("Город с slug " + slug + " не найден"));
     }
 
     @DeleteMapping("/{slug}")
@@ -51,7 +49,7 @@ public class LocationController {
         if (locationService.deleteLocation(slug)) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build();
+            throw new NotFoundException("Город с slug " + slug + " не найден");
         }
     }
 }

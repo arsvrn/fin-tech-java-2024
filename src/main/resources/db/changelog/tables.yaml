@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: tables/places.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: tables/event.yaml
+      relativeToChangelogFile: true
