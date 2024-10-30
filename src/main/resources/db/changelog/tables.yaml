@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: tables/event.yaml
       relativeToChangelogFile: true
+  - include:
+      file: tables/snapshots.yaml
+      relativeToChangelogFile: true

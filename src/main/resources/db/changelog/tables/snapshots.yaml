@@ -1,0 +1,86 @@
+databaseChangeLog:
+  - changeSet:
+      id: category_snapshots-1
+      author: "aashatalov"
+      changes:
+        - createTable:
+            tableName: "category_snapshots"
+            columns:
+              - column:
+                  name: "snapshot_id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "category_id"
+                  type: "INT"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "slug"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "name"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "snapshot_time"
+                  type: "TIMESTAMP"
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "category_snapshots"
+            baseColumnNames: "category_id"
+            referencedTableName: "categories"
+            referencedColumnNames: "id"
+            onDelete: "CASCADE"
+            onUpdate: "CASCADE"
+
+  - changeSet:
+      id: place_snapshots-2
+      author: "aashatalov"
+      changes:
+        - createTable:
+            tableName: "place_snapshots"
+            columns:
+              - column:
+                  name: "snapshot_id"
+                  type: "BIGINT"
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: "place_id"
+                  type: "BIGINT"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "slug"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "name"
+                  type: "VARCHAR(255)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: "snapshot_time"
+                  type: "TIMESTAMP"
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: "place_snapshots"
+            baseColumnNames: "place_id"
+            referencedTableName: "places"
+            referencedColumnNames: "id"
+            onDelete: "CASCADE"
+            onUpdate: "CASCADE"

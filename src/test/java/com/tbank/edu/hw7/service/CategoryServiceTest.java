@@ -1,7 +1,9 @@
 package com.tbank.edu.hw7.service;
 
 import com.tbank.edu.hw5.model.Category;
+import com.tbank.edu.hw11.observer.Observer;
 import com.tbank.edu.hw5.repository.CategoryRepositoryImpl;
+import com.tbank.edu.hw11.repository.CategorySnapshotRepository;
 import com.tbank.edu.hw5.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +18,17 @@ import static org.mockito.Mockito.*;
 class CategoryServiceTest {
 
     private CategoryRepositoryImpl categoryRepository;
+    private CategorySnapshotRepository snapshotRepository;
+    private Observer<Category> categoryObserver;
     private CategoryService categoryService;
 
     @BeforeEach
     void setUp() {
         categoryRepository = mock(CategoryRepositoryImpl.class);
-        categoryService = new CategoryService(categoryRepository);
+        snapshotRepository = mock(CategorySnapshotRepository.class);
+        categoryObserver = mock(Observer.class);
+
+        categoryService = new CategoryService(categoryRepository, snapshotRepository, categoryObserver);
     }
 
     @Test
@@ -40,7 +47,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getCategoryBy() {
+    void getCategoryById() {
         Category category = new Category(1, "slug 1", "Category 1");
         when(categoryRepository.findBy(1)).thenReturn(Optional.of(category));
 
@@ -48,6 +55,7 @@ class CategoryServiceTest {
 
         assertTrue(result.isPresent());
         assertEquals("Category 1", result.get().getName());
+        verify(categoryRepository, times(1)).findBy(1);
     }
 
     @Test
@@ -59,6 +67,7 @@ class CategoryServiceTest {
         assertNotNull(result);
         assertEquals("Category 1", result.getName());
         verify(categoryRepository, times(1)).save(category);
+        verify(categoryObserver, times(1)).update(category);
     }
 
     @Test
@@ -73,6 +82,7 @@ class CategoryServiceTest {
         assertTrue(result.isPresent());
         assertEquals("Updated Category", result.get().getName());
         verify(categoryRepository, times(1)).save(updatedCategory);
+        verify(categoryObserver, times(1)).update(updatedCategory);
     }
 
     @Test
@@ -83,6 +93,7 @@ class CategoryServiceTest {
 
         assertTrue(result);
         verify(categoryRepository, times(1)).deleteBy(1);
+        verify(categoryObserver, times(1)).update(any(Category.class));
     }
 
     @Test
@@ -93,12 +104,12 @@ class CategoryServiceTest {
 
         assertFalse(result);
         verify(categoryRepository, times(0)).deleteBy(1);
+        verify(categoryObserver, times(0)).update(any(Category.class)); // Проверяем, что наблюдатель не уведомлен
     }
 
     @Test
     void getCategoryById_NotFound() {
         when(categoryRepository.findBy(1)).thenReturn(Optional.empty());
-
         Optional<Category> result = categoryService.getCategoryById(1);
 
         assertFalse(result.isPresent());
@@ -115,6 +126,6 @@ class CategoryServiceTest {
 
         assertFalse(result.isPresent());
         verify(categoryRepository, times(0)).save(updatedCategory);
+        verify(categoryObserver, times(0)).update(updatedCategory);
     }
-
 }

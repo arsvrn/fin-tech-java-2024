@@ -1,5 +1,7 @@
 package com.tbank.edu.hw3;
 
+import com.tbank.edu.hw11.CustomIterator;
+
 public interface ListInterface<T> {
     void add(T value);
 
@@ -12,4 +14,5 @@ public interface ListInterface<T> {
     void addAll(ListInterface<T> list);
 
     int size();
+    CustomIterator<T> iterator();
 }

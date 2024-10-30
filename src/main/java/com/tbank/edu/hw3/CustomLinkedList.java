@@ -1,5 +1,9 @@
 package com.tbank.edu.hw3;
 
+import com.tbank.edu.hw11.CustomIterator;
+
+import java.util.function.Consumer;
+
 class CustomLinkedList<T> implements ListInterface<T> {
     private Node<T> head;
     private Node<T> tail;
@@ -97,5 +101,32 @@ class CustomLinkedList<T> implements ListInterface<T> {
     @Override
     public int size() {
         return size;
+    }
+
+    @Override
+    public CustomIterator<T> iterator() {
+        return new LinkedListIterator();
+    }
+
+    private class LinkedListIterator implements CustomIterator<T>{
+        private Node<T> current = head;
+        @Override
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        @Override
+        public T next() {
+            T data = current.data;
+            current = current.next;
+            return data;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super T> action) {
+            while (hasNext()) {
+                action.accept(next());
+            }
+        }
     }
 }
