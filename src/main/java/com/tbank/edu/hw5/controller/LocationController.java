@@ -3,6 +3,7 @@ package com.tbank.edu.hw5.controller;
 import com.tbank.edu.hw10.entity.Place;
 import com.tbank.edu.hw10.exception.NotFoundException;
 import com.tbank.edu.hw10.service.PlaceService;
+import com.tbank.edu.hw11.snapshot.PlaceSnapshot;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,5 +52,11 @@ public class LocationController {
         } else {
             throw new NotFoundException("Город с slug " + slug + " не найден");
         }
+    }
+
+    @GetMapping("/{slug}/history")
+    public ResponseEntity<List<PlaceSnapshot>> getLocationHistory(@PathVariable Long placeId) {
+        List<PlaceSnapshot> history = locationService.getLocationHistory(placeId);
+        return ResponseEntity.ok(history);
     }
 }

@@ -1,7 +1,7 @@
 package com.tbank.edu.hw5.init;
-
-import com.tbank.edu.hw5.model.Category;
-import com.tbank.edu.hw5.model.Location;
+import com.tbank.edu.hw11.command.Command;
+import com.tbank.edu.hw11.command.InitializeCategoriesCommand;
+import com.tbank.edu.hw11.command.InitializeLocationsCommand;
 import com.tbank.edu.hw5.repository.CategoryRepositoryImpl;
 import com.tbank.edu.hw5.repository.LocationRepositoryImpl;
 import com.tbank.edu.hw5.service.ExternalApiService;
@@ -24,9 +24,7 @@ public class DataInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
-    private final ExternalApiService externalApiService;
-    private final CategoryRepositoryImpl categoryRepository;
-    private final LocationRepositoryImpl locationRepository;
+    private final List<Command> commands;
     private final ExecutorService dataInitializerExecutor;
     private final ScheduledExecutorService scheduledTaskExecutor;
 
@@ -40,11 +38,14 @@ public class DataInitializer {
             LocationRepositoryImpl locationRepository,
             @Qualifier("dataInitializerExecutor") ExecutorService dataInitializerExecutor,
             @Qualifier("scheduledTaskExecutor") ScheduledExecutorService scheduledTaskExecutor) {
-        this.externalApiService = externalApiService;
-        this.categoryRepository = categoryRepository;
-        this.locationRepository = locationRepository;
+
         this.dataInitializerExecutor = dataInitializerExecutor;
         this.scheduledTaskExecutor = scheduledTaskExecutor;
+
+        this.commands = Arrays.asList(
+                new InitializeCategoriesCommand(externalApiService, categoryRepository),
+                new InitializeLocationsCommand(externalApiService, locationRepository)
+        );
     }
 
     @EventListener(ApplicationStartedEvent.class)
@@ -63,22 +64,12 @@ public class DataInitializer {
         logger.info("Запуск параллельной инициализации данных...");
         long startTime = System.nanoTime();
 
-        List<Callable<Void>> tasks = Arrays.asList(
-                () -> {
-                    logger.info("Запрос категорий...");
-                    List<Category> categories = externalApiService.fetchCategoriesOrNull();
-                    logger.info("Получено категорий: {}", categories.size());
-                    categoryRepository.save(categories);
+        List<Callable<Void>> tasks = commands.stream()
+                .map(command -> (Callable<Void>) () -> {
+                    command.execute();
                     return null;
-                },
-                () -> {
-                    logger.info("Запрос локаций...");
-                    List<Location> locations = externalApiService.fetchLocationsOrNull();
-                    logger.info("Получено локаций: {}", locations.size());
-                    locationRepository.save(locations);
-                    return null;
-                }
-        );
+                })
+                .toList();
 
         try {
             List<Future<Void>> futures = dataInitializerExecutor.invokeAll(tasks);
@@ -89,8 +80,8 @@ public class DataInitializer {
 
             long endTime = System.nanoTime();
             long duration = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
-
             logger.info("Инициализация данных завершена успешно за {} мс", duration);
+
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Ошибка во время инициализации данных: ", e);
             Thread.currentThread().interrupt();

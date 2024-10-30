@@ -1,5 +1,6 @@
 package com.tbank.edu.hw5.controller;
 
+import com.tbank.edu.hw11.snapshot.CategorySnapshot;
 import com.tbank.edu.hw5.model.Category;
 import com.tbank.edu.hw5.service.CategoryService;
 import org.springframework.http.HttpStatus;
@@ -53,5 +54,11 @@ public class CategoryController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<CategorySnapshot>> getCategoryHistory(@PathVariable int id) {
+        List<CategorySnapshot> history = categoryService.getCategoryHistory(id);
+        return ResponseEntity.ok(history);
     }
 }
