@@ -22,7 +22,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'adoptopenjdk'
+        distribution: 'adoptium'
 
     # Кэширование зависимостей Gradle для ускорения сборки
     - name: Cache Gradle dependencies
