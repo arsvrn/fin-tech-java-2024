@@ -35,7 +35,7 @@ jobs:
 
     # Сборка проекта и прогон тестов
     - name: Build and test with Gradle
-      run: ./gradlew clean build
+      run: ./gradlew build --no-daemon
 
     # Проверка покрытия тестами с использованием JaCoCo
     - name: Upload JaCoCo test coverage report
