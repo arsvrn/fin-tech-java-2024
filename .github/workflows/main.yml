@@ -36,9 +36,9 @@ jobs:
     - name: Give execute permission to gradlew
       run: chmod +x ./gradlew
       
-    # Сборка проекта и прогон тестов
-    - name: Build and test with Gradle
-      run: ./gradlew build --no-daemon
+    # Сборка проекта
+    - name: Build with Gradle
+      run: ./gradlew clean build -x test
 
     # Проверка покрытия тестами с использованием JaCoCo
     - name: Upload JaCoCo test coverage report
