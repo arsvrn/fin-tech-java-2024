@@ -1,7 +1,7 @@
 package com.tbank.edu.hw13.service;
 
 import com.tbank.edu.hw13.model.User;
-import com.tbank.edu.hw13.repositoy.UserRepository;
+import com.tbank.edu.hw13.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final String secretCode = "0000";
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -40,7 +41,7 @@ public class UserService {
     }
 
     public boolean resetPassword(String username, String newPassword, String code) {
-        if (!code.equals("0000")) {
+        if (!code.equals(secretCode)) {
             return false;
         }
 

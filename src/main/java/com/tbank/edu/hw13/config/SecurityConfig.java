@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+    private final int tokenValiditySeconds = 30 * 24 * 60 * 60;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -35,7 +36,8 @@ public class SecurityConfig {
                 .permitAll()
                 .and()
                 .rememberMe()
-                .tokenValiditySeconds(30 * 24 * 60 * 60); // Сессия сохраняется на 30 дней при "запомнить меня"
+                .key("uniqueAndSecretKey")
+                .tokenValiditySeconds(tokenValiditySeconds); // Сессия сохраняется на 30 дней при "запомнить меня"
         return http.build();
     }
 }

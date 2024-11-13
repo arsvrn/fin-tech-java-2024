@@ -1,14 +1,12 @@
 package com.tbank.edu.hw13.service;
 
 import com.tbank.edu.hw13.model.User;
-import com.tbank.edu.hw13.repositoy.UserRepository;
+import com.tbank.edu.hw13.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
