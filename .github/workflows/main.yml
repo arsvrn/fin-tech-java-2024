@@ -51,20 +51,14 @@ jobs:
     - name: Run static code analysis (Checkstyle)
       run: ./gradlew check
 
-    # Создание Docker-образа
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }} .
-    
-    # Вход в GitHub Packages Docker Registry
-    - name: Log in to GitHub Docker Registry
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.GITHUB_USERNAME }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      # Логин в GitHub Container Registry
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GIT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    # Заливка Docker-образа в GitHub Packages
-    - name: Push Docker image to GitHub Packages
-      run: |
-        docker tag ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }} ghcr.io/${{ secrets.GITHUB_USERNAME }}/my-app:${{ github.sha }}
-        docker push ghcr.io/${{ secrets.GITHUB_USERNAME }}/my-app:${{ github.sha }}
+      # Сборка Docker-образа
+    - name: Build Docker image
+      run: docker build -t ghcr.io/${{ github.repository }}/myapp:latest .
+
+      # Публикация Docker-образа в GitHub Packages
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository }}/myapp:latest
