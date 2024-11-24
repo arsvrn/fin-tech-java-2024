@@ -1,0 +1,64 @@
+name: Java CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Клонирование репозитория
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Настройка JDK
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    # Кэширование зависимостей Gradle для ускорения сборки
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Give execute permission to gradlew
+      run: chmod +x ./gradlew
+      
+    # Сборка проекта
+    - name: Build with Gradle
+      run: ./gradlew clean build -x test
+
+    # Проверка покрытия тестами с использованием JaCoCo
+    - name: Upload JaCoCo test coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: jacoco-report
+        path: build/reports/jacoco/test/html
+
+    # Статический анализ кода
+    - name: Run static code analysis (Checkstyle)
+      run: ./gradlew check
+
+      # Логин в GitHub Container Registry
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GIT_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Сборка Docker-образа
+    - name: Build Docker image
+      run: docker build -t ghcr.io/${{ github.repository }}/myapp:latest .
+
+      # Публикация Docker-образа в GitHub Packages
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository }}/myapp:latest
