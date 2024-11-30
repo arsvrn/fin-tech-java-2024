@@ -1,0 +1,4 @@
+[2024-11-30 13:56:05.936] - 7916 INFO [main] --- org.apache.catalina.core.StandardService: Starting service [Tomcat]
+[2024-11-30 13:56:05.949] - 7916 INFO [main] --- org.apache.catalina.core.StandardEngine: Starting Servlet engine: [Apache Tomcat/10.1.16]
+[2024-11-30 13:56:06.054] - 7916 INFO [main] --- org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]: Initializing Spring embedded WebApplicationContext
+[2024-11-30 13:56:16.091] - 7916 INFO [http-nio-8080-exec-2] --- org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]: Initializing Spring DispatcherServlet 'dispatcherServlet'
